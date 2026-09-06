@@ -1,0 +1,42 @@
+name: Regenerate Vendor Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+          channel: stable
+          cache: true
+
+      - name: Regenerate Android project
+        working-directory: mobile/vendor_app
+        run: |
+          flutter clean || true
+          flutter create \
+            --platforms=android \
+            --org com.vendorhub \
+            .
+
+      - name: Verify Flutter project
+        working-directory: mobile/vendor_app
+        run: |
+          flutter pub get
+          flutter analyze
+
+      - name: Commit Android wrapper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mobile/vendor_app/android
+          git commit -m "Regenerate vendor Android wrapper with Flutter" || true
+          git push

@@ -1,0 +1,54 @@
+CodeCanyon License Agreement
+
+This license is a legal agreement between you and the author for the use of
+VendorHub (the "Item"). By purchasing or downloading the Item, you agree to be
+bound by the terms of this license.
+
+REGULAR LICENSE
+
+Your use of the Item is subject to the following terms:
+
+1. You may use the Item to create one single End Product for yourself or for
+   one client (a "single application").
+2. You may NOT use the Item to create multiple End Products.
+3. The End Product is a customized implementation of the Item requiring an
+   application of skill and effort.
+4. You may charge your client for the End Product.
+5. You may make modifications to the Item to fit your End Product.
+6. This license does NOT allow you to resell or redistribute the Item
+   "as-is" or with superficial modifications.
+
+EXTENDED LICENSE
+
+The Extended License grants you all rights under the Regular License, plus:
+
+1. You may use the Item to create multiple End Products.
+2. You may charge End Users for access to the End Product.
+3. You may create SaaS applications.
+
+RESTRICTIONS
+
+You may NOT:
+
+- Sell, distribute, or give away the source code
+- Use the Item in any application allowing End Users to customize or create
+  derivative works
+- Re-distribute the Item as stock, in a tool or template, or with source files
+- Create End Products that are designed to allow End Users to build their own
+  End Products using the Item
+
+COPYRIGHT
+
+All intellectual property rights, including copyrights, are owned by the author.
+
+SUPPORT
+
+6 months of support is included with your purchase. Extended support is
+available separately.
+
+WARRANTY
+
+The Item is provided "as is" without warranty of any kind, either expressed or
+implied.
+
+For complete terms, visit: https://codecanyon.net/licenses/standard

@@ -1,0 +1,9 @@
+*
+!storage/
+!framework/
+!framework/cache/
+!framework/cache/data/
+!framework/sessions/
+!framework/views/
+!logs/
+!.gitignore

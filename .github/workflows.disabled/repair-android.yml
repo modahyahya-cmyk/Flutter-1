@@ -1,0 +1,65 @@
+name: Repair Driver Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+          channel: stable
+          cache: true
+
+      - name: Backup Android
+        run: |
+          if [ -d mobile/driver_app/android ]; then
+            rm -rf mobile/driver_app.BACKUP3
+            cp -r mobile/driver_app mobile/driver_app.BACKUP3
+          fi
+
+      - name: Regenerate Driver Android
+        working-directory: mobile/driver_app
+        run: |
+          rm -rf android
+          flutter create --platforms=android --org com.vendorhub .
+
+      - name: Restore Driver Dart project
+        run: |
+          rm -rf mobile/driver_app/lib
+          cp -r mobile/driver_app.BACKUP3/lib mobile/driver_app/lib
+
+          rm -f mobile/driver_app/pubspec.yaml
+          cp mobile/driver_app.BACKUP3/pubspec.yaml mobile/driver_app/pubspec.yaml
+
+          rm -rf mobile/driver_app/assets
+          cp -r mobile/driver_app.BACKUP3/assets mobile/driver_app/assets
+
+      - name: Get dependencies
+        working-directory: mobile/driver_app
+        run: flutter pub get
+
+      - name: Build Driver APK
+        working-directory: mobile/driver_app
+        run: flutter build apk --release --no-tree-shake-icons
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: driver-app-release
+          path: mobile/driver_app/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Commit regenerated Android
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mobile/driver_app/android
+          git commit -m "Regenerate Driver Android with supported Flutter template" || true
+          git push

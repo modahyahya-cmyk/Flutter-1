@@ -1,0 +1,50 @@
+name: Strict Production Multi-APK Compiler
+
+on:
+  workflow_dispatch:
+
+jobs:
+  flutter-build:
+    name: Compiling App
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [customer_app, driver_app, vendor_app]
+      fail-fast: false
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Inject Secure Java Production Environment
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Boot Clean Flutter Engine
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+          cache: false
+
+      - name: Fetch Core Dependencies
+        run: |
+          cd mobile/${{ matrix.app }}
+          flutter pub get
+
+      - name: Execute Isar Generation Loop
+        if: matrix.app == 'driver_app'
+        run: |
+          cd mobile/driver_app
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Compile Industrial Release APK
+        run: |
+          cd mobile/${{ matrix.app }}
+          flutter build apk --release --no-tree-shake-icons
+
+      - name: Export Certified Production APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-stable-apk
+          path: mobile/${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk

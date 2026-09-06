@@ -1,0 +1,25 @@
+VendorHub — Quick Start
+=======================
+
+1. EXTRACT
+   Unzip VendorHub-<version>-CodeCanyon.zip to a folder.
+
+2. INSTALL APPS
+   Copy the .apk files from 01-APK-Files to an Android device and install them.
+   Enable "Install from Unknown Sources" if prompted.
+
+3. SET UP THE BACKEND
+   cd 02-Backend-Source/backend
+   composer install --optimize-autoloader --no-dev
+   cp .env.example .env
+   php artisan key:generate
+   php artisan migrate --force
+   php artisan db:seed --class=DatabaseSeeder
+
+4. POINT APPS TO YOUR SERVER
+   In each app's lib/config/app_config.dart set BASE_API_URL to your API.
+
+5. LOGIN
+   Use the seeded demo accounts (see INSTALLATION.md) or register new accounts.
+
+6. CHANGE DEFAULT CREDENTIALS immediately.

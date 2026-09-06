@@ -1,0 +1,125 @@
+name: VendorHub Phase 2 - Structural Repair
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+          channel: stable
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Verify applications
+        run: |
+          test -f mobile/customer_app/pubspec.yaml
+          test -f mobile/vendor_app/pubspec.yaml
+          test -f mobile/driver_app/pubspec.yaml
+
+      - name: Create Vendor Android project
+        working-directory: mobile/vendor_app
+        run: |
+          if [ ! -d android ]; then
+            flutter create \
+              --platforms=android \
+              --org com.vendorhub \
+              --project-name vendor_app \
+              .
+          fi
+
+      - name: Resolve Customer dependencies
+        working-directory: mobile/customer_app
+        run: flutter pub get
+
+      - name: Resolve Vendor dependencies
+        working-directory: mobile/vendor_app
+        run: flutter pub get
+
+      - name: Resolve Driver dependencies
+        working-directory: mobile/driver_app
+        run: flutter pub get
+
+      - name: Generate Driver source
+        working-directory: mobile/driver_app
+        run: |
+          if grep -q "build_runner" pubspec.yaml; then
+            dart run build_runner build --delete-conflicting-outputs
+          fi
+
+      - name: Verify generated code
+        run: |
+          if grep -q "isar_generator" mobile/driver_app/pubspec.yaml; then
+            find mobile/driver_app -type f -name '*.g.dart' | grep -q .
+          fi
+
+      - name: Verify Android projects
+        run: |
+          test -f mobile/customer_app/android/settings.gradle \
+            || test -f mobile/customer_app/android/settings.gradle.kts
+
+          test -f mobile/vendor_app/android/settings.gradle \
+            || test -f mobile/vendor_app/android/settings.gradle.kts
+
+          test -f mobile/driver_app/android/settings.gradle \
+            || test -f mobile/driver_app/android/settings.gradle.kts
+
+      - name: Verify lockfiles
+        run: |
+          test -f mobile/customer_app/pubspec.lock
+          test -f mobile/vendor_app/pubspec.lock
+          test -f mobile/driver_app/pubspec.lock
+
+      - name: Analyze Customer
+        working-directory: mobile/customer_app
+        run: flutter analyze --no-fatal-infos
+
+      - name: Analyze Vendor
+        working-directory: mobile/vendor_app
+        run: flutter analyze --no-fatal-infos
+
+      - name: Analyze Driver
+        working-directory: mobile/driver_app
+        run: flutter analyze --no-fatal-infos
+
+      - name: Commit repaired structure
+        run: |
+          git config user.name "VendorHub CI"
+          git config user.email "actions@github.com"
+
+          git add \
+            mobile/customer_app/pubspec.lock \
+            mobile/vendor_app/android \
+            mobile/vendor_app/pubspec.lock \
+            mobile/driver_app/pubspec.lock \
+            mobile/driver_app/lib
+
+          if git diff --cached --quiet; then
+            echo "No structural changes to commit."
+          else
+            git commit -m "chore(ci): repair Flutter project structure"
+            git push origin HEAD:main
+          fi

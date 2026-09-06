@@ -1,0 +1,25 @@
+VendorHub — System Requirements
+===============================
+
+BACKEND SERVER
+--------------
+OS:        Ubuntu 20.04+ / CentOS 8+ / Windows Server 2019+
+Web Server: Nginx 1.18+ or Apache 2.4+
+PHP:       8.3 or higher (extensions: mbstring, dom, fileinfo, mysql, redis)
+Database:  MySQL 8.0+ or PostgreSQL 13+
+Cache:     Redis 6.0+
+Memory:    2GB minimum (4GB recommended)
+Storage:   10GB available
+
+MOBILE APPS
+-----------
+Android:   7.0 (API 24) or higher
+RAM:       2GB minimum
+Storage:   200MB available
+
+BUILD MACHINE (from source)
+---------------------------
+Flutter SDK: 3.24.0 or higher
+Android Studio: latest
+Java JDK:     17 or higher
+RAM:          8GB minimum (16GB recommended)

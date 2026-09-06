@@ -1,0 +1,60 @@
+{
+    "name": "vendorhub/backend",
+    "description": "VendorHub multi-vendor e-commerce & delivery REST API (Clean Architecture).",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^12.0",
+        "firebase/php-jwt": "^7.0",
+        "predis/predis": "^2.2",
+        "stripe/stripe-php": "^15.0",
+        "kreait/firebase-php": "^7.0",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/pint": "^1.18",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.1",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "App\\Core\\Domain\\": "app/Core/Domain/",
+            "App\\Core\\Infrastructure\\": "app/Core/Infrastructure/",
+            "App\\Core\\Presentation\\": "app/Core/Presentation/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php artisan package:discover --ansi"
+        ],
+        "test": [
+            "@php artisan test"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "platform": {
+            "php": "8.4.1"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

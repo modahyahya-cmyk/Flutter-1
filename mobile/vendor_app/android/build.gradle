@@ -1,0 +1,64 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+/*
+ * Compatibility fix for legacy Flutter plugins.
+ *
+ * IMPORTANT:
+ * Do not use afterEvaluate here.
+ * Some projects may already be evaluated when Gradle reaches this code,
+ * which causes:
+ *
+ * Cannot run Project.afterEvaluate(Closure) when the project is already evaluated
+ */
+subprojects { project ->
+
+    def namespaceMap = [
+        "isar_flutter_libs":
+            "dev.isar.isar_flutter_libs",
+
+        "flutter_bluetooth_serial":
+            "io.github.edufolly.flutterbluetoothserial"
+    ]
+
+    project.pluginManager.withPlugin("com.android.library") {
+
+        def androidExtension =
+            project.extensions.findByName("android")
+
+        if (androidExtension != null) {
+
+            // Force a modern compile SDK for legacy plugin subprojects that
+            // still pin an old one in their own build.gradle.
+            if (androidExtension.hasProperty("compileSdk")) {
+                androidExtension.compileSdk = 36
+            }
+
+            if (
+                namespaceMap.containsKey(project.name) &&
+                androidExtension.namespace == null
+            ) {
+                androidExtension.namespace =
+                    namespaceMap[project.name]
+            }
+        }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

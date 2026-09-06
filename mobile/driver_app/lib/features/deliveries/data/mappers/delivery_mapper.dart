@@ -1,0 +1,111 @@
+import '../../../../core/storage/models/delivery_local_model.dart';
+import '../../domain/entities/delivery.dart';
+import '../models/delivery_model.dart';
+
+class DeliveryMapper {
+  static Delivery fromModel(DeliveryModel model) => Delivery(
+        id: model.id,
+        orderId: model.orderId,
+        orderNumber: model.orderNumber,
+        status: model.status,
+        vendorName: model.vendorName,
+        vendorPhone: model.vendorPhone,
+        customerName: model.customerName,
+        customerPhone: model.customerPhone,
+        pickupLocation: model.pickupLocation,
+        pickupAddress: model.pickupAddress,
+        dropoffLocation: model.dropoffLocation,
+        dropoffAddress: model.dropoffAddress,
+        distanceKm: model.distanceKm,
+        deliveryFee: model.deliveryFee,
+        driverEarnings: model.driverEarnings,
+        platformCommission: model.platformCommission,
+        tipAmount: model.tipAmount,
+        orderTotal: model.orderTotal,
+        items: model.items,
+        assignedAt: model.assignedAt,
+        acceptedAt: model.acceptedAt,
+        pickedUpAt: model.pickedUpAt,
+        arrivedAt: model.arrivedAt,
+        deliveredAt: model.deliveredAt,
+        failedAt: model.failedAt,
+        deliveryNotes: model.deliveryNotes,
+        failureReason: model.failureReason,
+        deliveryProofImage: model.deliveryProofImage,
+      );
+
+  static Delivery fromJson(Map<String, dynamic> json) =>
+      fromModel(DeliveryModel.fromJson(json));
+
+  static DeliveryLocalModel toLocal(
+    Delivery delivery, {
+    bool? needsSync,
+    bool? isOfflineCreated,
+  }) =>
+      DeliveryLocalModel(
+        deliveryId: delivery.id,
+        orderId: delivery.orderId,
+        orderNumber: delivery.orderNumber,
+        vendorName: delivery.vendorName,
+        vendorPhone: delivery.vendorPhone,
+        customerName: delivery.customerName,
+        customerPhone: delivery.customerPhone,
+        status: delivery.status.wire,
+        pickupLatitude: delivery.pickupLocation.latitude,
+        pickupLongitude: delivery.pickupLocation.longitude,
+        pickupAddress: delivery.pickupAddress,
+        dropoffLatitude: delivery.dropoffLocation.latitude,
+        dropoffLongitude: delivery.dropoffLocation.longitude,
+        dropoffAddress: delivery.dropoffAddress,
+        distanceKm: delivery.distanceKm,
+        deliveryFee: delivery.deliveryFee,
+        driverEarnings: delivery.driverEarnings,
+        platformCommission: delivery.platformCommission,
+        tipAmount: delivery.tipAmount,
+        assignedAt: delivery.assignedAt ?? DateTime.now(),
+        acceptedAt: delivery.acceptedAt,
+        pickedUpAt: delivery.pickedUpAt,
+        arrivedAt: delivery.arrivedAt,
+        deliveredAt: delivery.deliveredAt,
+        failedAt: delivery.failedAt,
+        deliveryNotes: delivery.deliveryNotes,
+        deliveryProofImage: delivery.deliveryProofImage,
+        failureReason: delivery.failureReason,
+        needsSync: needsSync ?? delivery.needsSync,
+        isOfflineCreated: isOfflineCreated ?? delivery.isOfflineCreated,
+      );
+
+  static Delivery fromLocal(DeliveryLocalModel local) => Delivery(
+        id: local.deliveryId,
+        orderId: local.orderId,
+        orderNumber: local.orderNumber,
+        status: DeliveryStatus.fromWire(local.status),
+        vendorName: local.vendorName,
+        vendorPhone: local.vendorPhone,
+        customerName: local.customerName,
+        customerPhone: local.customerPhone,
+        pickupLocation: LatLng(latitude: local.pickupLatitude, longitude: local.pickupLongitude),
+        pickupAddress: local.pickupAddress,
+        dropoffLocation: LatLng(latitude: local.dropoffLatitude, longitude: local.dropoffLongitude),
+        dropoffAddress: local.dropoffAddress,
+        distanceKm: local.distanceKm,
+        deliveryFee: local.deliveryFee,
+        driverEarnings: local.driverEarnings,
+        platformCommission: local.platformCommission,
+        tipAmount: local.tipAmount,
+        // Order line items and order total aren't cached offline.
+        orderTotal: 0,
+        items: const [],
+        assignedAt: local.assignedAt,
+        acceptedAt: local.acceptedAt,
+        pickedUpAt: local.pickedUpAt,
+        arrivedAt: local.arrivedAt,
+        deliveredAt: local.deliveredAt,
+        failedAt: local.failedAt,
+        deliveryNotes: local.deliveryNotes,
+        failureReason: local.failureReason,
+        deliveryProofImage: local.deliveryProofImage,
+        needsSync: local.needsSync,
+        isOfflineCreated: local.isOfflineCreated,
+      );
+}

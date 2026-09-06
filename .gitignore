@@ -1,0 +1,47 @@
+# --- Global ---
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
+.env.*.local
+/ide-helpers/
+
+# --- Backend (Laravel) ---
+/backend/vendor/
+/backend/storage/*.key
+/backend/storage/app/private/
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
+/backend/storage/logs/*
+/backend/bootstrap/cache/*.php
+/backend/public/storage
+/backend/public/build
+/backend/.phpunit.result.cache
+/backend/.phpunit.cache/
+/backend/.idea/
+/backend/.vscode/
+/backend/coverage/
+
+# --- Mobile (Flutter) ---
+/mobile/**/.dart_tool/
+/mobile/**/.packages
+/mobile/**/build/
+/mobile/**/.flutter-plugins
+/mobile/**/.flutter-plugins-dependencies
+/mobile/**/.idea/
+/mobile/**/.vscode/
+/mobile/**/android/.gradle/
+/mobile/**/android/local.properties
+/mobile/**/android/key.properties
+/mobile/**/ios/Pods/
+/mobile/**/ios/.symlinks/
+/mobile/**/ios/Flutter/ephemeral/
+mobile/**/pubspec.lock
+# Keep a lock file only for apps (production pin) -> handled per app
+/mobile/**/coverage/
+/mobile/**/*.iml
+
+# Local SQLite test/dev database
+/backend/database/*.sqlite
