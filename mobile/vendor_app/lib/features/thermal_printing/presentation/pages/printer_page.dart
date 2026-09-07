@@ -14,7 +14,7 @@ class PrinterPage extends StatefulWidget {
 }
 
 class _PrinterPageState extends State<PrinterPage> {
-  ProductController get _controller => locator<PrinterController>();
+  PrinterController get _controller => locator<PrinterController>();
 
   @override
   void initState() {
