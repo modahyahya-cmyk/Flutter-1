@@ -4,11 +4,16 @@ on:
   push:
     paths:
       - 'backend/**'
+      - '.github/workflows/backend-tests.yml'
     branches:
       - main
+      # TEMPORARY (verification): allow the session branch to run this
+      # workflow once; remove after the first green run.
+      - arena/01a081c7-flutter-1
   pull_request:
     paths:
       - 'backend/**'
+      - '.github/workflows/backend-tests.yml'
   workflow_dispatch:
 
 jobs:
@@ -42,5 +47,5 @@ jobs:
       - name: Run test suite
         run: php artisan test
 
-      - name: Sanity: route map renders
+      - name: Sanity - route map renders
         run: php artisan route:list
