@@ -6,6 +6,7 @@ import '../../../../config/dependency_injection.dart';
 import '../../../location_tracking/presentation/controllers/location_controller.dart';
 import '../../domain/entities/delivery.dart';
 import '../controllers/delivery_controller.dart';
+import '../widgets/delivery_route_map.dart';
 
 class DeliveryDetailPage extends StatelessWidget {
   DeliveryDetailPage({super.key, required this.deliveryId});
@@ -69,6 +70,14 @@ class DeliveryDetailPage extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                height: 220,
+                child: DeliveryRouteMap(delivery: delivery),
               ),
             ),
             const SizedBox(height: 12),

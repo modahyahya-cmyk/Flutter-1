@@ -238,7 +238,6 @@ Future<void> setupDependencyInjection() async {
   locator.registerLazySingleton<ConnectPrinterUseCase>(
       () => ConnectPrinterUseCase(repository: locator()));
   locator.registerLazySingleton<PrintOrderUseCase>(() => PrintOrderUseCase(
-        repository: locator(),
         printService: locator(),
       ));
   locator.registerLazySingleton<TestPrintUseCase>(() => TestPrintUseCase(

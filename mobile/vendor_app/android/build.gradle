@@ -27,14 +27,6 @@ subprojects {
  */
 subprojects { project ->
 
-    def namespaceMap = [
-        "isar_flutter_libs":
-            "dev.isar.isar_flutter_libs",
-
-        "flutter_bluetooth_serial":
-            "io.github.edufolly.flutterbluetoothserial"
-    ]
-
     project.pluginManager.withPlugin("com.android.library") {
 
         def androidExtension =
@@ -44,16 +36,10 @@ subprojects { project ->
 
             // Force a modern compile SDK for legacy plugin subprojects that
             // still pin an old one in their own build.gradle.
+            // (Plugin namespaces are self-declared by the current plugin
+            // set; spp_connection_plugin ships its own namespace.)
             if (androidExtension.hasProperty("compileSdk")) {
                 androidExtension.compileSdk = 36
-            }
-
-            if (
-                namespaceMap.containsKey(project.name) &&
-                androidExtension.namespace == null
-            ) {
-                androidExtension.namespace =
-                    namespaceMap[project.name]
             }
         }
     }

@@ -1,7 +1,8 @@
 # Database Schema
 
 This folder contains the **authoritative, versioned database schema** as
-Laravel migrations under `migrations/` (18 tables). The schema is applied with:
+Laravel migrations under `migrations/` (19 tables + 3 alterations, 22
+migration files). The schema is applied with:
 
 ```bash
 php artisan migrate --force
@@ -43,6 +44,7 @@ mysqldump -u root -p vendorhub > database/seeders/demo_data.sql
 | 16 | `payments` |
 | 17 | `addresses` |
 | 18 | `reviews` |
+| 19 | `location_history` |
 
 ## Seeders
 

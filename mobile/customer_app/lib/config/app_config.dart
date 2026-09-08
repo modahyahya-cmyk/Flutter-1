@@ -69,8 +69,8 @@ class AppConfig {
   // =========================================================================
   // TYPOGRAPHY
   // =========================================================================
+  // 'Inter' is bundled in assets/fonts and registered in pubspec.yaml.
   static const String FONT_FAMILY = 'Inter';
-  static const String FONT_FAMILY_SECONDARY = 'Poppins';
 
   // =========================================================================
   // FEATURE FLAGS

@@ -30,9 +30,6 @@ subprojects { project ->
     def namespaceMap = [
         "isar_flutter_libs":
             "dev.isar.isar_flutter_libs",
-
-        "flutter_bluetooth_serial":
-            "io.github.edufolly.flutterbluetoothserial"
     ]
 
     project.pluginManager.withPlugin("com.android.library") {

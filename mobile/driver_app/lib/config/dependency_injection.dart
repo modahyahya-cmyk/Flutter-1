@@ -280,5 +280,7 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton(() => GetEarningsUseCase(repository: getIt<EarningsRepository>()));
   getIt.registerLazySingleton(() => SyncEarningsUseCase(repository: getIt<EarningsRepository>()));
 
-  getIt.registerLazySingleton<EarningsController>(() => EarningsController());
+  getIt.registerLazySingleton<EarningsController>(
+    () => EarningsController(getEarningsUseCase: getIt<GetEarningsUseCase>()),
+  );
 }

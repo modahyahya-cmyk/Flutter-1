@@ -4,7 +4,7 @@
 
 ```
 vendorhub-ecosystem/
-├── backend/          Laravel 11 API (clean architecture)
+├── backend/          Laravel 12 API (clean architecture)
 │   ├── app/Domain            repo + service interfaces, entities
 │   ├── app/Infrastructure    Eloquent repos, auth/order/payment services
 │   ├── app/Presentation      controllers, requests, resources, middleware

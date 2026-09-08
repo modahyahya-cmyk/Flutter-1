@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../config/app_config.dart';
 
@@ -22,7 +23,8 @@ class LoggingInterceptor extends Interceptor {
   }
 
   void _log(String message) {
-    // ignore: avoid_print
-    print(message);
+    // debugPrint is the sanctioned logging path in Flutter (no avoid_print
+    // lint, respects the Flutter logging framework in all build modes).
+    debugPrint(message);
   }
 }

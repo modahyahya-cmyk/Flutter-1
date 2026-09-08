@@ -12,10 +12,10 @@ Legend: ✅ implemented · 🔄 following pattern (pending) · ⏳ planned
 
 ### ✅ Implemented
 - **White-label config** — `config/app_settings.php` (single source of truth).
-- **Database** — all 18 migrations (users, vendors, branches, categories,
-  products, product_variants, orders, order_items, drivers, deliveries, carts,
-  cart_items, videos, subscription_plans, subscriptions, payments, addresses,
-  reviews).
+- **Database** — all migrations (19 tables + 3 alterations: users, vendors,
+  branches, categories, products, product_variants, orders, order_items,
+  drivers, deliveries, carts, cart_items, videos, subscription_plans,
+  subscriptions, payments, addresses, reviews, location_history).
 - **Eloquent models** — full relationships & casts for all tables.
 - **Clean Architecture** — Domain (8 repo interfaces + 6 service interfaces),
   Infrastructure (8 Eloquent repos + auth/order/payment/notification/subscription
@@ -102,7 +102,7 @@ Legend: ✅ implemented · 🔄 following pattern (pending) · ⏳ planned
 ## How to verify / run
 
 Toolchains are not installed in the authoring sandbox, so code was authored to
-standard Laravel 11 / Flutter conventions. To verify locally:
+standard Laravel 12 / Flutter conventions. To verify locally:
 
 ```bash
 # Backend

@@ -1,77 +1,119 @@
-import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:spp_connection_plugin/spp_connection_plugin.dart';
 
 import '../../../../core/errors/exceptions.dart';
 import '../../domain/entities/printer_device.dart';
 
-/// Thin wrapper over [FlutterBluetoothSerial] that exposes only what the
-/// printing feature needs. Keeps the plugin isolated from the business layer.
+/// Thin wrapper over [SppConnectionPlugin] (Bluetooth Classic SPP — the
+/// profile used by ESC/POS thermal printers) that exposes only what the
+/// printing feature needs. Keeps the plugin isolated from the business
+/// layer so the transport can be swapped without touching callers.
 class BluetoothDataSource {
-  BluetoothDataSource({FlutterBluetoothSerial? serial})
-      : _serial = serial ?? FlutterBluetoothSerial.instance;
+  BluetoothDataSource({SppConnectionPlugin? plugin})
+      : _plugin = plugin ?? SppConnectionPlugin();
 
-  final FlutterBluetoothSerial _serial;
-  BluetoothConnection? _connection;
+  final SppConnectionPlugin _plugin;
+
   String? _connectedAddress;
 
+  /// ESC/POS printers are paired through the Android system settings
+  /// first, so discovery lists the PAIRED (bonded) devices. Classic SPP
+  /// devices cannot be paired from an in-app scan on modern Android, and
+  /// listing bonded devices is the same flow the previous plugin used.
   Future<List<PrinterDevice>> discoverDevices() async {
     try {
-      final bonded = await _serial.getBondedDevices();
-      final results = await _serial.startDiscovery().toList();
-      final discovered = results
-          .where((r) => r.device.name != null && r.device.name!.isNotEmpty)
-          .map((r) => PrinterDevice(name: r.device.name!, address: r.device.address))
-          .toList();
+      if (!await _ensurePermissions()) {
+        throw const AppException(
+          message: 'Bluetooth permission is required to list printers.',
+        );
+      }
 
-      final seed = <String, PrinterDevice>{};
-      for (final b in bonded) {
-        if (b.name != null && b.name!.isNotEmpty) {
-          seed[b.address] = PrinterDevice(name: b.name!, address: b.address);
-        }
+      final enabled = await _plugin.isBluetoothEnabled();
+      if (!enabled) {
+        throw const AppException(message: 'Bluetooth is not enabled.');
       }
-      for (final d in discovered) {
-        seed[d.address] = d;
-      }
-      return seed.values.toList();
+
+      final devices = await _plugin.getPairedDevices();
+      return devices
+          .where((d) => d.name.trim().isNotEmpty)
+          .map((d) => PrinterDevice(name: d.displayName, address: d.address))
+          .toList();
+    } on AppException {
+      rethrow;
     } catch (_) {
-      throw const AppException(message: 'Bluetooth discovery failed. Ensure Bluetooth is on.');
+      throw const AppException(
+        message: 'Bluetooth discovery failed. Ensure Bluetooth is on.',
+      );
     }
   }
 
   Future<void> connect(String address) async {
+    if (_connectedAddress == address && isConnected) {
+      return; // Already connected to this printer.
+    }
+
     try {
-      _connection = await BluetoothConnection.toAddress(address);
+      if (!await _ensurePermissions()) {
+        throw const AppException(
+          message: 'Bluetooth permission is required to connect.',
+        );
+      }
+
+      await _plugin.connectToDevice(address);
+
+      // connectToDevice resolves when the socket is open on Android, but
+      // double-check the state stream so a slow/failing link is reported
+      // instead of surfacing later as a write error.
+      if (_plugin.connectionState != BluetoothConnectionState.connected) {
+        await _plugin.connectionStateStream
+            .firstWhere((s) => s == BluetoothConnectionState.connected)
+            .timeout(const Duration(seconds: 15));
+      }
+
       _connectedAddress = address;
-      _connection!.input?.listen((_) {});
-      
+    } on AppException {
+      rethrow;
     } catch (_) {
+      _connectedAddress = null;
       throw const AppException(message: 'Could not connect to printer device');
     }
   }
 
   Future<void> disconnect() async {
     try {
-      await _connection?.close();
+      if (_connectedAddress != null) {
+        await _plugin.disconnect();
+      }
     } catch (_) {
       // already closed
     }
-    _connection = null;
     _connectedAddress = null;
   }
 
   Future<void> write(List<int> bytes) async {
-    if (_connection == null) {
+    if (_connectedAddress == null) {
       throw const AppException(message: 'Printer is not connected');
     }
+
     try {
-      _connection!.output.add(Uint8List.fromList(bytes));
+      await _plugin.sendData(Uint8List.fromList(bytes));
     } catch (_) {
       throw const AppException(message: 'Failed to send data to printer');
     }
   }
 
-  bool get isConnected => _connection != null;
+  bool get isConnected =>
+      _connectedAddress != null &&
+      _plugin.connectionState == BluetoothConnectionState.connected;
+
   String? get connectedAddress => _connectedAddress;
+
+  Future<bool> _ensurePermissions() async {
+    if (await _plugin.hasPermissions()) {
+      return true;
+    }
+
+    return await _plugin.requestPermissions();
+  }
 }

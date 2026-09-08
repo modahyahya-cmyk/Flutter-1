@@ -12,13 +12,13 @@ configuration.
 
 ```
 vendorhub-ecosystem/
-├── backend/                 # Laravel 11 REST API (Clean Architecture)
+├── backend/                 # Laravel 12 REST API (Clean Architecture)
 │   ├── app/
 │   │   ├── Core/            # Domain (interfaces/entities) + Infrastructure (impl)
 │   │   └── Models/          # Eloquent models
 │   ├── config/              # app_settings.php = white-label master config
 │   ├── database/
-│   │   ├── migrations/      # 18 tables
+│   │   ├── migrations/      # 19 tables + 3 alterations (22 files)
 │   │   ├── seeders/
 │   │   └── factories/
 │   ├── routes/
@@ -37,10 +37,10 @@ vendorhub-ecosystem/
 
 | Layer          | Technology                                        |
 |----------------|---------------------------------------------------|
-| Backend        | Laravel 11, PHP 8.3, MySQL/Postgres, Redis queue  |
+| Backend        | Laravel 12, PHP 8.3, MySQL/Postgres, Redis queue  |
 | Auth           | JWT (multi-guard: customer / vendor / driver / admin) |
 | Mobile         | Flutter / Dart, Clean Architecture (data·domain·presentation) |
-| Maps           | OpenStreetMap (zero-cost default), Google/Maps/Mapbox hot-swap |
+| Maps           | OpenStreetMap via flutter_map (zero-cost default, no API key); Google/Mapbox are reserved config slots |
 | Payments       | Stripe / Paystack / Razorpay / PayPal abstraction |
 | Notifications  | Firebase FCM / OneSignal / Twilio SMS abstraction |
 | Local storage  | Isar + Hive offline-first sync (driver app)         |
@@ -88,10 +88,11 @@ cd mobile/customer_app && flutter analyze && flutter test && flutter build apk -
 > lockout, rate limiting, transactional role registration, centralized
 > authorization, authoritative order/delivery state machines, idempotent
 > order/payment/webhook flows). Android projects exist for all three apps.
-> **iOS projects are not yet generated** and **no Flutter/Android/iOS/`php
-> artisan` build has been executed in a toolchain in this repo's CI**, so the
-> apps and APKs should be built and verified locally (or in CI) before
-> release. Payment webhooks require a live provider secret to enable.
+> The `build-apk.yml` workflow runs `flutter analyze`, `flutter test` and a
+> release APK build for every app (manual trigger). **iOS projects are not
+> yet generated** and the backend is not yet wired to a CI test job, so run
+> `php artisan test` locally before release. Payment webhooks require a live
+> provider secret to enable.
 
 ---
 

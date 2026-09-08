@@ -22,9 +22,13 @@ class CreateOrderRequest extends FormRequest
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'address_id' => ['nullable', 'exists:addresses,id'],
             'fulfillment_type' => ['nullable', 'in:delivery,pickup'],
-            'payment_method' => ['nullable', 'in:stripe,paystack,razorpay,paypal,cash_on_delivery,wallet'],
-            'customer_note' => ['nullable', 'string', 'max:1000'],
-            'coupon_code' => ['nullable', 'string', 'max:100'],
+            // 'wallet' is intentionally absent: no wallet gateway is
+            // implemented, so accepting it would create orders that can
+            // never be paid.
+            'payment_method' => ['nullable', 'in:stripe,paystack,razorpay,paypal,cash_on_delivery'],
+            // Must match the orders.customer_notes column and the key read
+            // by OrderProcessingService::createOrder().
+            'customer_notes' => ['nullable', 'string', 'max:1000'],
             'delivery_address' => ['nullable', 'string', 'max:500'],
             'customer_latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'customer_longitude' => ['nullable', 'numeric', 'between:-180,180'],

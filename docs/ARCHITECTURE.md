@@ -36,7 +36,11 @@ providers and feature flags resolve from them.
 ## Hot-swappable providers
 
 - **Maps** — `MapProvider` enum + `app_settings['maps']`: OpenStreetMap is the
-  zero-cost default; Google Maps / Mapbox enabled by supplying a key.
+  zero-cost default and the **implemented** provider (flutter_map, rendered in
+  the customer map page and the driver delivery-route view, no API key
+  required). Google Maps / Mapbox are reserved configuration slots
+  (`GOOGLE_MAPS_KEY` / `MAPBOX_TOKEN` in the app configs) pending their
+  provider integrations.
 - **Payments** — `PaymentGatewayInterface` + adapters; default from
   `app_settings['payment_gateways']['default']`.
 - **Notifications** — `NotificationServiceInterface` façade over Firebase /

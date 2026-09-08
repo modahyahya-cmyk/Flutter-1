@@ -16,8 +16,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Eloquent models stay mass-assignment guarded by default; in
+        // non-production environments lazy loading also raises an exception
+        // so N+1 / missing-eager-load bugs surface in development.
         Model::preventLazyLoading(! $this->app->isProduction());
-        Model::unguard(false);
 
         RateLimiter::for('api', function (Request $request) {
             $limit = (int) config('app_settings.security.rate_limit_per_minute', 60);

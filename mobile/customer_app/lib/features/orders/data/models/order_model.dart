@@ -11,7 +11,7 @@ class OrderModel extends Order {
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
-      // تحويل آمن لمنع تعارض String و int في معرّف الطلب
+      // Defensive parse: the id may arrive as either String or int.
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
       orderNumber: json['order_number']?.toString() ??
           json['id']?.toString() ??

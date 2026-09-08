@@ -12,29 +12,34 @@ class MapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The active provider is resolved from the white-label config; OSM is the
-    // zero-cost default and the widget below is swapped per provider.
-    final effectiveCenter =
-        center ?? const MapLocation(latitude: 15.3694, longitude: 44.1910); // Sana'a default
+    // OSM is the zero-cost default provider from the white-label config.
+    final provider = AppConfig.DEFAULT_MAP_PROVIDER;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Map')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.6,
-              child: OsmMapWidget(center: effectiveCenter, markers: markers),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: OsmMapWidget(center: center, markers: markers, zoom: 13),
+          ),
+          Positioned(
+            left: 12,
+            bottom: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                'Provider: ${provider.name}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.white,
+                    ),
+              ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Provider: ${AppConfig.DEFAULT_MAP_PROVIDER.name}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
