@@ -6,7 +6,9 @@ on:
       - 'mobile/**'
       - '.github/workflows/build-apk.yml'
   push:
-    branches: [main]
+    # TEMPORARY (verification): the session branch may also push while
+    # release builds are being debugged; revert to [main] after.
+    branches: [main, 'arena/01a081c7-flutter-1']
     paths:
       - 'mobile/**'
       - '.github/workflows/build-apk.yml'
