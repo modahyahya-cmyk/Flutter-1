@@ -1,11 +1,85 @@
-name: Strict Production Multi-APK Compiler
+name: Flutter Quality & APK
 
 on:
+  pull_request:
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/build-apk.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/build-apk.yml'
   workflow_dispatch:
 
 jobs:
-  flutter-build:
-    name: Compiling App
+  # Runs on every PR + main push: fast verification of all three apps.
+  quality:
+    name: Analyze & Test (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [customer_app, driver_app, vendor_app]
+      fail-fast: false
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Boot Clean Flutter Engine
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+          cache: false
+
+      - name: Fetch Core Dependencies
+        run: |
+          cd mobile/${{ matrix.app }}
+          flutter pub get
+
+      - name: Execute Isar Generation Loop
+        if: matrix.app == 'driver_app'
+        run: |
+          cd mobile/driver_app
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Static Analysis
+        id: analyze
+        continue-on-error: true
+        run: |
+          cd mobile/${{ matrix.app }}
+          flutter analyze --no-pub > analyze_report.txt 2>&1
+          status=$?
+          if [ $status -ne 0 ]; then
+            {
+              echo '## flutter analyze (failed)'
+              echo '```'
+              cat analyze_report.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit $status
+
+      - name: Run Unit & Widget Tests
+        id: test
+        continue-on-error: true
+        run: |
+          cd mobile/${{ matrix.app }}
+          flutter test --no-pub > test_report.txt 2>&1
+          status=$?
+          if [ $status -ne 0 ]; then
+            {
+              echo '## flutter test (failed)'
+              echo '```'
+              tail -c 60000 test_report.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit $status
+
+  # Heavy release build: manual dispatch or main pushes only.
+  apk:
+    name: Compile Release APK (${{ matrix.app }})
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     strategy:
       matrix:

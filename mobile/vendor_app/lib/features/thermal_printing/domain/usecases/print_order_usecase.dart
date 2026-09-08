@@ -1,18 +1,14 @@
 import '../../../orders/domain/entities/order.dart';
-import '../repositories/printer_repository.dart';
 import '../repositories/print_service.dart';
 
 class PrintOrderUseCase {
-  PrintOrderUseCase({required this.repository, required this.printService});
+  PrintOrderUseCase({required this.printService});
 
-  final PrinterRepository repository;
   final PrintService printService;
 
-  /// Builds and transmits a receipt for [order]. Requires a connection.
+  /// Builds and transmits a receipt for [order]. Requires a connection
+  /// (enforced by [printService.write] on the transport).
   Future<void> call(Order order, {required String vendorName, required String branchName}) async {
-    if (!repository.isConnected) {
-      // repo.printOrder enforces the transport preconditions
-    }
     final bytes = await printService.buildOrderReceipt(
       orderId: order.id,
       orderNumber: order.orderNumber,
@@ -30,7 +26,6 @@ class PrintOrderUseCase {
       branchName: branchName,
     );
     await printService.write(bytes);
-    await repository.printOrder(orderId: order.id);
   }
 
   Map<String, dynamic> _toMap(dynamic item) => {

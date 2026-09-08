@@ -46,6 +46,10 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> {
   final AuthController _auth = getIt<AuthController>();
 
+  // Ensures the one-shot navigation happens exactly once, even if the
+  // Obx closure rebuilds while the session is still restoring.
+  bool _navigated = false;
+
   @override
   void initState() {
     super.initState();
@@ -56,13 +60,18 @@ class _AuthGateState extends State<AuthGate> {
   Widget build(BuildContext context) {
     return Obx(() {
       final status = _auth.status.value;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (status == AuthStatus.authenticated && _auth.user.value != null) {
-          Get.offAllNamed(AppRoutes.home);
-        } else if (status == AuthStatus.unauthenticated) {
-          Get.offAllNamed(AppRoutes.login);
-        }
-      });
+      if (!_navigated) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || _navigated) return;
+          if (status == AuthStatus.authenticated && _auth.user.value != null) {
+            _navigated = true;
+            Get.offAllNamed(AppRoutes.home);
+          } else if (status == AuthStatus.unauthenticated) {
+            _navigated = true;
+            Get.offAllNamed(AppRoutes.login);
+          }
+        });
+      }
 
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),

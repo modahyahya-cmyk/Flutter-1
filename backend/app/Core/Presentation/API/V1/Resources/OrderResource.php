@@ -32,6 +32,7 @@ class OrderResource extends JsonResource
             'payment_status' => $this->payment_status,
             'payment_method' => $this->payment_method,
             'delivery_address' => $this->delivery_address,
+            'customer_notes' => $this->customer_notes,
             'delivery_latitude' => $this->delivery_latitude !== null ? (float) $this->delivery_latitude : null,
             'delivery_longitude' => $this->delivery_longitude !== null ? (float) $this->delivery_longitude : null,
             'delivery_distance_km' => $this->delivery_distance_km !== null ? (float) $this->delivery_distance_km : null,

@@ -14,7 +14,7 @@ class ApiClient {
       final response = await _dio.get(path, queryParameters: queryParameters);
       return response.data;
     } on DioException catch (e) {
-      throw ServerException(message: e.message ?? 'فشل قراءة البيانات من الخادم');
+      throw ServerException(message: e.message ?? 'Failed to read data from the server');
     }
   }
 
@@ -23,7 +23,7 @@ class ApiClient {
       final response = await _dio.post(path, data: data);
       return response.data;
     } on DioException catch (e) {
-      throw ServerException(message: e.message ?? 'فشل إرسال البيانات');
+      throw ServerException(message: e.message ?? 'Failed to send the data');
     }
   }
 
@@ -32,7 +32,7 @@ class ApiClient {
       final response = await _dio.patch(path, data: data);
       return response.data;
     } on DioException catch (e) {
-      throw ServerException(message: e.message ?? 'فشل تحديث البيانات');
+      throw ServerException(message: e.message ?? 'Failed to update the data');
     }
   }
 
@@ -41,7 +41,7 @@ class ApiClient {
       final response = await _dio.put(path, data: data);
       return response.data;
     } on DioException catch (e) {
-      throw ServerException(message: e.message ?? 'فشل تحديث البيانات');
+      throw ServerException(message: e.message ?? 'Failed to update the data');
     }
   }
 
@@ -50,7 +50,7 @@ class ApiClient {
       final response = await _dio.delete(path, data: data);
       return response.data;
     } on DioException catch (e) {
-      throw ServerException(message: e.message ?? 'فشل حذف البيانات');
+      throw ServerException(message: e.message ?? 'Failed to delete the data');
     }
   }
 }

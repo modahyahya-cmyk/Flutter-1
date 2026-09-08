@@ -81,13 +81,25 @@ class OrderController extends BaseController
             $product = $this->products->findById((int) $item['product_id']);
             abort_if($product === null, 422, 'Product not found.');
 
+            // Only purchasable products may be ordered. Inactive/draft
+            // products must not be orderable even if the id is known.
+            abort_unless(
+                $product->status === 'active',
+                422,
+                "Product '{$product->name}' is not available for purchase."
+            );
+
             $unitPrice = $product->price;
 
             if (! empty($item['product_variant_id'])) {
                 $variant = $product->variants->firstWhere('id', (int) $item['product_variant_id']);
-                if ($variant !== null && $variant->price !== null) {
-                    $unitPrice = $variant->price;
-                }
+                abort_if($variant === null, 422, 'Product variant not found.');
+                abort_unless(
+                    (bool) $variant->is_active,
+                    422,
+                    "Product variant '{$variant->name}' is not available."
+                );
+                $unitPrice = $variant->price;
             }
 
             return [

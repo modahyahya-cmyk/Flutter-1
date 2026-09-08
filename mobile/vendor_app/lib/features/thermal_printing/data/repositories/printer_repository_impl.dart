@@ -34,21 +34,6 @@ class PrinterRepositoryImpl implements PrinterRepository {
   Future<void> disconnect() => bluetoothDataSource.disconnect();
 
   @override
-  Future<void> printOrder({required int orderId}) async {
-    if (!bluetoothDataSource.isConnected) {
-      throw const AppException(message: 'Printer is not connected');
-    }
-  }
-
-  @override
-  Future<bool> testPrint() async {
-    if (!bluetoothDataSource.isConnected) {
-      throw const AppException(message: 'Printer is not connected');
-    }
-    return true;
-  }
-
-  @override
   bool get isConnected => bluetoothDataSource.isConnected;
 
   @override

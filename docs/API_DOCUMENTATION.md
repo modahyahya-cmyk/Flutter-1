@@ -10,14 +10,15 @@ All requests and responses are JSON. Authenticated endpoints use
 
 ## Standard Response Shapes
 
-**Success**
+All responses are wrapped:
+
 ```json
-{ "data": { } }
+{ "success": true, "message": "Success", "data": { } }
 ```
 
 **Paginated**
 ```json
-{ "data": [ ], "links": { }, "meta": { "current_page": 1, "per_page": 15, "total": 42 } }
+{ "success": true, "message": "Success", "data": [ ], "meta": { "current_page": 1, "per_page": 15, "total": 42 } }
 ```
 
 **Validation error (422)**
@@ -29,6 +30,9 @@ All requests and responses are JSON. Authenticated endpoints use
 ```json
 { "message": "Unauthenticated." }
 ```
+
+**API overview** — `GET /documentation` returns the machine-readable
+endpoint map (referenced by the `docs` key in the root web response).
 
 ---
 
@@ -88,16 +92,62 @@ Response: `{ "access_token": "...", "refresh_token": "...", "token_type": "Beare
 
 ---
 
+## Customer (authenticated)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/customer/auth/logout` | Logout (revokes the current session) |
+| GET | `/customer/profile` | Current customer |
+| POST | `/customer/profile` | Update profile |
+| POST | `/customer/profile/password` | Change password |
+| GET | `/customer/cart` | Current cart |
+| POST | `/customer/cart/items` | Add item `{ "product_id", "quantity", "product_variant_id"? }` |
+| PUT | `/customer/cart/items/{cartItem}` | Update quantity |
+| DELETE | `/customer/cart/items/{cartItem}` | Remove item |
+| DELETE | `/customer/cart` | Clear cart |
+| GET | `/customer/orders` | My orders (`?per_page=`) |
+| POST | `/customer/orders` | Place an order (see contract below) |
+| GET | `/customer/orders/{id}` | Order detail (own orders only) |
+| POST | `/customer/orders/{id}/cancel` | Cancel (pending/confirmed only) |
+| POST | `/customer/payments` | Initialize a payment `{ "order_id", "provider" }` |
+| GET | `/customer/payments/{reference}` | Payment status |
+| GET | `/customer/videos/{id}/like` | Like a video |
+| GET | `/customer/subscriptions/plans` | Subscription plans |
+| POST | `/customer/subscriptions` | Subscribe `{ "plan_id" }` |
+| GET | `/customer/subscriptions/me` | My subscription |
+| POST | `/customer/subscriptions/{id}/cancel` | Cancel subscription |
+
+**Order creation contract** (`POST /customer/orders`)
+
+- `vendor_id` (required) — all items must belong to this vendor.
+- `items[].product_id`, `items[].quantity` (required),
+  `items[].product_variant_id` (optional).
+- `payment_method` — one of `stripe`, `paystack`, `razorpay`, `paypal`,
+  `cash_on_delivery` (default: the configured gateway). Prices are always
+  re-read from the catalogue server-side; client-supplied prices are ignored.
+- Only products with status `active` (and active variants) can be ordered;
+  anything else is rejected with 422.
+- `customer_notes` — free-text note stored on the order and returned in the
+  order payload.
+- `idempotency_key` (optional) — retrying with the same key returns the
+  original order instead of creating a duplicate.
+
+---
+
 ## Public
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/products` | Catalogue (`?category=&featured=`) |
+| GET | `/health` | Health check |
+| GET | `/documentation` | Machine-readable endpoint overview |
+| GET | `/products` | Catalogue |
+| GET | `/products/featured` | Featured products |
+| GET | `/products/best-sellers` | Best sellers |
+| GET | `/products/search` | Search (`?q=`) |
 | GET | `/products/{id}` | Product detail |
-| GET | `/categories` | Categories |
 | GET | `/videos` | Video feed |
-| GET | `/vendors/{id}` | Vendor storefront |
-| GET | `/branches` | Branches |
+| GET | `/videos/{id}` | Video detail |
+| POST | `/webhooks/stripe` | Stripe webhook (provider-signed) |
 
 ---
 

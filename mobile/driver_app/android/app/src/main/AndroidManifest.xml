@@ -12,8 +12,7 @@
     <application
         android:label="VendorHub Driver"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
+        android:icon="@mipmap/ic_launcher">
         
         <meta-data
             android:name="flutterEmbedding"

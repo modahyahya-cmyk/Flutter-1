@@ -38,6 +38,26 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         'time' => now()->toIso8601String(),
     ]));
 
+    // --- API overview (referenced by the root web response `docs` key) ---
+    Route::get('/documentation', fn () => response()->json([
+        'success' => true,
+        'data' => [
+            'name' => config('app_settings.app_name', 'VendorHub'),
+            'version' => 'v1',
+            'base_url' => '/api/v1',
+            'authentication' => 'Bearer JWT (multi-guard: customer / vendor / driver / admin)',
+            'groups' => [
+                'public' => ['GET /products', 'GET /products/{id}', 'GET /videos', 'POST /webhooks/stripe'],
+                'auth' => ['POST /customer/auth/register', 'POST /customer/auth/login', 'POST /vendor/auth/login', 'POST /driver/auth/login', 'POST /admin/auth/login'],
+                'customer' => ['GET /customer/profile', 'POST /customer/orders', 'GET /customer/orders', 'GET /customer/cart'],
+                'vendor' => ['GET /vendor/products', 'POST /vendor/products', 'GET /vendor/orders', 'PATCH /vendor/orders/{id}/status'],
+                'driver' => ['GET /driver/deliveries', 'GET /driver/deliveries/available', 'POST /driver/deliveries/{orderId}/accept', 'PUT /driver/location'],
+                'admin' => ['GET /admin/dashboard/stats', 'PATCH /admin/vendors/{id}/approve', 'PATCH /admin/drivers/{id}/approve'],
+            ],
+            'full_docs' => 'docs/API_DOCUMENTATION.md (repository)',
+        ],
+    ]));
+
     // --- Payment webhooks (provider-signed; signature verified server-side) ---
     Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle']);
 
