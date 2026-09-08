@@ -84,7 +84,8 @@ jobs:
           fi
           exit $status
 
-  # Heavy release build: manual dispatch or main pushes only.
+  # Heavy release build: manual dispatch, main pushes (and the
+  # session branch while debugging) only.
   apk:
     name: Compile Release APK (${{ matrix.app }})
     # TEMPORARY (verification): the session branch may also build APKs
