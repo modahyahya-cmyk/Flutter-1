@@ -80,8 +80,6 @@ Future<void> setupDependencyInjection() async {
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
   locator.registerSingleton<FlutterSecureStorage>(const FlutterSecureStorage());
   locator.registerSingleton<Connectivity>(Connectivity());
-  locator.registerFactory<InternetConnectionChecker>(() => InternetConnectionChecker());
-
   locator.registerLazySingleton<InternetConnectionChecker>(
     () => InternetConnectionChecker(),
   );
