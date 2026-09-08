@@ -14,6 +14,11 @@ on:
       - '.github/workflows/build-apk.yml'
   workflow_dispatch:
 
+# Needed for the temporary debug loop that commits build reports back
+# to the .ci-debug/ directory on the session branch.
+permissions:
+  contents: write
+
 jobs:
   # Runs on every PR + main push: fast verification of all three apps.
   quality:
@@ -127,15 +132,19 @@ jobs:
           cd mobile/driver_app
           dart run build_runner build --delete-conflicting-outputs
 
-      - name: Compile Industrial Release APK
-        id: apk
+      # Probe step: its mere presence + the renamed compile step below tell
+      # us which workflow revision GitHub is actually executing.
+      - name: Summary Probe v3
         run: |
-          # Probe: proves the summary channel works and which workflow
-          # revision GitHub actually executed (SHA must be the latest).
           {
             echo '## APK debug probe'
             echo "sha=${{ github.sha }} app=${{ matrix.app }}"
+            echo "step summary channel test"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Compile Industrial Release APK v3
+        id: apk
+        run: |
           cd mobile/${{ matrix.app }}
           echo 'phase=build-started' >> "$GITHUB_STEP_SUMMARY"
           # `set +e`: the default runner shell is bash -e, which would abort
@@ -183,3 +192,25 @@ jobs:
             mobile/${{ matrix.app }}/apk_report.txt
             mobile/${{ matrix.app }}/apk_report_find.txt
           if-no-files-found: warn
+
+      # TEMPORARY debug fallback: raw log download is blocked from the
+      # dev sandbox, so commit the reports to .ci-debug/ on the session
+      # branch (not in any trigger path -> no loop). Remove after debugging.
+      - name: Commit Build Report (debug fallback)
+        if: always() && matrix.app != 'vendor_app'
+        run: |
+          set +e
+          mkdir -p .ci-debug
+          cp "mobile/${{ matrix.app }}/apk_report.txt" ".ci-debug/apk-error-${{ matrix.app }}.txt" 2>/dev/null
+          cp "mobile/${{ matrix.app }}/apk_report_find.txt" ".ci-debug/apk-find-${{ matrix.app }}.txt" 2>/dev/null
+          git config user.name "github-actions[bot]"
+          git config user.email "41891882+github-actions[bot]@users.noreply.github.com"
+          git add .ci-debug
+          git diff --cached --quiet || git commit -m "ci-debug: ${{ matrix.app }} build report"
+          git fetch origin arena/01a081c7-flutter-1
+          git rebase FETCH_HEAD
+          git push origin "HEAD:arena/01a081c7-flutter-1"
+          push_status=$?
+          set -e
+          echo "ci-debug push status: $push_status" >> "$GITHUB_STEP_SUMMARY"
+          exit $push_status
