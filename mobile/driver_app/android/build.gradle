@@ -50,14 +50,6 @@ subprojects { project ->
                 namespaceMap[project.name]
         }
 
-            if (
-                namespaceMap.containsKey(project.name) &&
-                androidExtension.namespace == null
-            ) {
-                androidExtension.namespace =
-                    namespaceMap[project.name]
-            }
-        }
     }
 }
 
