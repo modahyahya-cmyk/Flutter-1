@@ -1,0 +1,39 @@
+Running Gradle task 'assembleRelease'...                        
+Checking the license for package NDK (Side by side) 27.0.12077973 in /usr/local/lib/android/sdk/licenses
+License for package NDK (Side by side) 27.0.12077973 accepted.
+Preparing "Install NDK (Side by side) 27.0.12077973 v.27.0.12077973".
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" ready.
+Installing NDK (Side by side) 27.0.12077973 in /usr/local/lib/android/sdk/ndk/27.0.12077973
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" complete.
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" finished.
+Checking the license for package Android SDK Platform 30 in /usr/local/lib/android/sdk/licenses
+License for package Android SDK Platform 30 accepted.
+Preparing "Install Android SDK Platform 30 (revision 3)".
+"Install Android SDK Platform 30 (revision 3)" ready.
+Installing Android SDK Platform 30 in /usr/local/lib/android/sdk/platforms/android-30
+"Install Android SDK Platform 30 (revision 3)" complete.
+"Install Android SDK Platform 30 (revision 3)" finished.
+lib/features/deliveries/presentation/widgets/delivery_route_map.dart:37:11: Error: No named parameter with the name 'attribution'.
+          attribution: AppConfig.OSM_ATTRIBUTION,
+          ^^^^^^^^^^^
+../../../../../.pub-cache/hosted/pub.dev/flutter_map-6.1.0/lib/src/layer/tile_layer/tile_layer.dart:239:3: Context: Found this candidate, but the arguments don't match.
+  TileLayer({
+  ^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildRelease'.
+> Process 'command '/opt/hostedtoolcache/flutter/stable-3.35.4-x64/flutter/bin/flutter'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 3m 30s
+Running Gradle task 'assembleRelease'...                          211.7s
+Gradle task assembleRelease failed with exit code 1

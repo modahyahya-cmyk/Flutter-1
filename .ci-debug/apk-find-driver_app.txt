@@ -1,0 +1,4 @@
+exit status: 1
+--- find build -name '*.apk' ---
+--- ls build/app/outputs ---
+(no outputs dir)
