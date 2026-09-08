@@ -30,19 +30,25 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          # composer.json pins config.platform.php to 8.4.1, so match it.
+          php-version: '8.4'
           coverage: none
           extensions: mbstring, dom, curl, libxml, bcmath, sqlite3
 
-      - name: Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
-
       - name: Prepare test environment
+        # Before composer: post-autoload-dump runs `artisan package:discover`,
+        # which boots the app and needs a valid .env / APP_KEY.
+        # The key is generated with plain PHP - `artisan key:generate`
+        # would already require vendor/, which composer installs next.
         run: |
           cp .env.example .env
-          php artisan key:generate
+          KEY="base64:$(php -r 'echo base64_encode(random_bytes(32));')"
+          sed -i "s|^APP_KEY=.*|APP_KEY=${KEY}|" .env
         # phpunit.xml already pins sqlite :memory:, JWT_SECRET and a test
         # APP_KEY, so this only satisfies app bootstrap for route:list.
+
+      - name: Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run test suite
         run: php artisan test
