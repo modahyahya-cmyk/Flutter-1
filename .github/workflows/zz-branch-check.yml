@@ -1,0 +1,10 @@
+name: ZZ Branch Check
+on:
+  push:
+    branches:
+      - arena/01a081c7-flutter-1
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "hello from branch check"
