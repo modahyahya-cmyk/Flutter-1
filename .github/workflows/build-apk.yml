@@ -130,13 +130,21 @@ jobs:
       - name: Compile Industrial Release APK
         id: apk
         run: |
+          # Probe: proves the summary channel works and which workflow
+          # revision GitHub actually executed (SHA must be the latest).
+          {
+            echo '## APK debug probe'
+            echo "sha=${{ github.sha }} app=${{ matrix.app }}"
+          } >> "$GITHUB_STEP_SUMMARY"
           cd mobile/${{ matrix.app }}
+          echo 'phase=build-started' >> "$GITHUB_STEP_SUMMARY"
           # `set +e`: the default runner shell is bash -e, which would abort
           # this script at the failing command before status is captured.
           set +e
           flutter build apk --release --no-tree-shake-icons > apk_report.txt 2>&1
           status=$?
           set -e
+          echo "phase=build-finished status=$status" >> "$GITHUB_STEP_SUMMARY"
           # Debug aid: record what the build actually produced.
           {
             echo "exit status: $status"
