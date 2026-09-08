@@ -3,8 +3,17 @@ on:
   push:
     branches:
       - arena/01a081c7-flutter-1
+  pull_request:
+  workflow_dispatch:
 jobs:
   echo:
+    name: Tests & Route Map
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
-      - run: echo "hello from branch check"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Echo
+        run: echo "step works"
