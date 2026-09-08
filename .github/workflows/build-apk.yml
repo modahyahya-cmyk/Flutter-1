@@ -18,6 +18,8 @@ jobs:
   # Runs on every PR + main push: fast verification of all three apps.
   quality:
     name: Analyze & Test (${{ matrix.app }})
+    # TEMPORARY (debugging APK builds): disabled for a few iterations.
+    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -122,11 +124,18 @@ jobs:
 
       - name: Compile Industrial Release APK
         id: apk
-        continue-on-error: true
         run: |
           cd mobile/${{ matrix.app }}
           flutter build apk --release --no-tree-shake-icons > apk_report.txt 2>&1
           status=$?
+          # Debug aid: record what the build actually produced.
+          {
+            echo "exit status: $status"
+            echo "--- find build -name '*.apk' ---"
+            find build -name '*.apk' 2>/dev/null || echo "(no build dir)"
+            echo "--- ls build/app/outputs ---"
+            ls -laR build/app/outputs 2>/dev/null || echo "(no outputs dir)"
+          } > apk_report_find.txt
           if [ $status -ne 0 ]; then
             {
               echo '## flutter build apk (failed)'
@@ -142,3 +151,18 @@ jobs:
         with:
           name: ${{ matrix.app }}-stable-apk
           path: mobile/${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk
+          # A "successful" build that produced no APK must fail the job,
+          # not slip through as a silent no-op upload.
+          if-no-files-found: error
+
+      # TEMPORARY (debugging): keep the full build report + produced-file
+      # listing for inspection; remove once release builds are green.
+      - name: Upload Build Debug Bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-apk-debug
+          path: |
+            mobile/${{ matrix.app }}/apk_report.txt
+            mobile/${{ matrix.app }}/apk_report_find.txt
+          if-no-files-found: warn

@@ -25,6 +25,8 @@ Thumbs.db
 /backend/coverage/
 
 # --- Mobile (Flutter) ---
+/mobile/**/*_report.txt
+/mobile/**/*_report_find.txt
 /mobile/**/.dart_tool/
 /mobile/**/.packages
 /mobile/**/build/
