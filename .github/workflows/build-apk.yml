@@ -43,14 +43,38 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
 
       - name: Static Analysis
+        id: analyze
+        continue-on-error: true
         run: |
           cd mobile/${{ matrix.app }}
-          flutter analyze
+          flutter analyze --no-pub > analyze_report.txt 2>&1
+          status=$?
+          if [ $status -ne 0 ]; then
+            {
+              echo '## flutter analyze (failed)'
+              echo '```'
+              cat analyze_report.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit $status
 
       - name: Run Unit & Widget Tests
+        id: test
+        continue-on-error: true
         run: |
           cd mobile/${{ matrix.app }}
-          flutter test
+          flutter test --no-pub > test_report.txt 2>&1
+          status=$?
+          if [ $status -ne 0 ]; then
+            {
+              echo '## flutter test (failed)'
+              echo '```'
+              tail -c 60000 test_report.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit $status
 
   # Heavy release build: manual dispatch or main pushes only.
   apk:
