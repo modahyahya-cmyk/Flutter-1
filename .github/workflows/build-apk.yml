@@ -51,8 +51,10 @@ jobs:
         continue-on-error: true
         run: |
           cd mobile/${{ matrix.app }}
+          set +e
           flutter analyze --no-pub > analyze_report.txt 2>&1
           status=$?
+          set -e
           if [ $status -ne 0 ]; then
             {
               echo '## flutter analyze (failed)'
@@ -68,8 +70,10 @@ jobs:
         continue-on-error: true
         run: |
           cd mobile/${{ matrix.app }}
+          set +e
           flutter test --no-pub > test_report.txt 2>&1
           status=$?
+          set -e
           if [ $status -ne 0 ]; then
             {
               echo '## flutter test (failed)'
@@ -126,8 +130,12 @@ jobs:
         id: apk
         run: |
           cd mobile/${{ matrix.app }}
+          # `set +e`: the default runner shell is bash -e, which would abort
+          # this script at the failing command before status is captured.
+          set +e
           flutter build apk --release --no-tree-shake-icons > apk_report.txt 2>&1
           status=$?
+          set -e
           # Debug aid: record what the build actually produced.
           {
             echo "exit status: $status"
