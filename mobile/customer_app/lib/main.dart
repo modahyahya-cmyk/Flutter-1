@@ -14,9 +14,7 @@ Future<void> main() async {
     await setupDependencyInjection()
         .timeout(const Duration(seconds: 10));
 
-    await getIt<AuthController>()
-        .restoreSession()
-        .timeout(const Duration(seconds: 10));
+    await getIt<AuthController>().restoreSession();
   } catch (e, stackTrace) {
     debugPrint('Application startup error: $e');
     debugPrintStack(stackTrace: stackTrace);

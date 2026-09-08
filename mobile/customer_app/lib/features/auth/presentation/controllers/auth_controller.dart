@@ -73,12 +73,17 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      user = await getCurrentUserUseCase();
-      status = user == null ? AuthStatus.unauthenticated : AuthStatus.authenticated;
+      user = await getCurrentUserUseCase()
+          .timeout(const Duration(seconds: 10));
+      status = user == null
+          ? AuthStatus.unauthenticated
+          : AuthStatus.authenticated;
     } on Object catch (e) {
       failure = _map(e);
+      user = null;
       status = AuthStatus.unauthenticated;
     }
+
     notifyListeners();
   }
 
